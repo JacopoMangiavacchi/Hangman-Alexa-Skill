@@ -39,16 +39,17 @@ function buildResponse(sessionAttributes, speechletResponse) {
 
 // --------------- Functions that control the skill's behavior -----------------------
 
-function getSecretWord() {
+function getNewSessionAttributes() {
     return {
         secretWord: "computer",
+        wordsTried: ""
     };
 }
 
 function getWelcomeResponse(callback, sessionAttributes) {
     // If we wanted to initialize the session to have some attributes we could add those here.
     if (sessionAttributes === null) {
-        sessionAttributes = getSecretWord();
+        sessionAttributes = getNewSessionAttributes();
     }
 
     const cardTitle = 'Welcome';
@@ -72,6 +73,48 @@ function handleSessionEndRequest(callback) {
     callback({}, buildSpeechletResponse(cardTitle, speechOutput, null, shouldEndSession));
 }
 
+function startGame(intent, session, callback) {
+    const sessionAttributes = getNewSessionAttributes();
+
+    const cardTitle = 'New Game';
+    const speechOutput = 'Ok, I started a new game. ' +
+        'You need to catch the word I guessed.  Try to catch this word one letter at a time';
+    // If the user either does not reply to the welcome message or says something that is not
+    // understood, they will be prompted again with this text.
+    const repromptText = 'Please tell me your first letter';
+    const shouldEndSession = false;
+
+    callback(sessionAttributes,
+        buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+}
+
+function tryLetter(intent, session, callback) {
+    var sessionAttributes = session.attributes;
+    var speechOutput = "";
+
+    const letter = intent.slots.Letter.value
+
+    console.log(`tryLetter ${letter}`);
+
+    if (sessionAttributes.wordsTried.indexOf(letter) > -1) {
+        speechOutput = "You already tried letter <say-as interpret-as=\"spell-out\">" + letter + "</say-as>.  Please try a new one";
+    }
+    else {
+        sessionAttributes.wordsTried += letter;
+        speechOutput = "My guessed word doesn't contain the letter <say-as interpret-as=\"spell-out\">" + letter + "</say-as>.  Please try a new one";
+    }
+
+    const cardTitle = 'Try Letter';
+    const shouldEndSession = false;
+
+    callback(sessionAttributes,
+        buildSpeechletResponse(cardTitle, speechOutput, null, shouldEndSession));
+}
+
+function tryLetterAlpha(intent, session, callback) {
+    callback(null, buildResponse(session.attributes, "Letter Alpha"));
+}
+
 function surrender(intent, session, callback) {
     callback(null, buildResponse(session.attributes, "Surrender"));
 }
@@ -84,18 +127,6 @@ function getExplanation(intent, session, callback) {
     callback(null, buildResponse(session.attributes, "Explanation"));
 }
 
-function tryLetter(intent, session, callback) {
-    callback(null, buildResponse(session.attributes, "Letter"));
-}
-
-function tryLetterAlpha(intent, session, callback) {
-    callback(null, buildResponse(session.attributes, "Letter Alpha"));
-}
-
-function startGame(intent, session, callback) {
-    callback(null, buildResponse(session.attributes, "Start"));
-}
-
 
 // --------------- Events -----------------------
 
@@ -103,7 +134,7 @@ function startGame(intent, session, callback) {
  * Called when the session starts.
  */
 function onSessionStarted(sessionStartedRequest, session) {
-    session.attributes = getSecretWord()
+    session.attributes = getNewSessionAttributes()
     console.log(`onSessionStarted requestId=${sessionStartedRequest.requestId}, sessionId=${session.sessionId}`);
 }
 
