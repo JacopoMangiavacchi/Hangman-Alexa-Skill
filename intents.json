@@ -1,0 +1,52 @@
+{
+  "intents": [
+    {
+      "intent": "Surrender"
+    },
+    {
+      "intent": "Point"
+    },
+    {
+      "intent": "Explain"
+    },
+    {
+      "intent": "TryLetter",
+      "slots": [
+        {
+          "name": "Letter",
+          "type": "LIST_OF_LETTER"
+        }
+      ]
+    },
+    {
+      "intent": "TryLetterAlpha",
+      "slots": [
+        {
+          "name": "LetterAlpha",
+          "type": "LIST_OF_LETTER_ALPHA"
+        }
+      ]
+    },
+    {
+      "intent": "AMAZON.StartOverIntent"
+    },
+    {
+      "intent": "AMAZON.RepeatIntent"
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.YesIntent"
+    },
+    {
+      "intent": "AMAZON.NoIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.CancelIntent"
+    }
+  ]
+}
