@@ -1,0 +1,22 @@
+{
+  "name": "hangman-alexa-skill",
+  "version": "1.0.0",
+  "description": "An Alexa Skill for playing the Hangman game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "alexa",
+    "skill"
+  ],
+  "author": "Jacopo Mangiavacchi",
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "dependencies": {
+    "alexa-sdk": "^1.0.8"
+  },
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/JacopoMangiavacchi/Hangman-Alexa-Skill"
+  }
+}

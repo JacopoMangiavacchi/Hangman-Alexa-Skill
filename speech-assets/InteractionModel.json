@@ -1,0 +1,427 @@
+{
+  "intents": [
+    {
+      "name": "AMAZON.CancelIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.HelpIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.StopIntent",
+      "samples": []
+    },
+    {
+      "name": "Explain",
+      "samples": [
+        "tell me more about the word",
+        "tell me about the word",
+        "what does it mean",
+        "what is the meaning"
+      ],
+      "slots": []
+    },
+    {
+      "name": "Point",
+      "samples": [
+        "what are the points"
+      ],
+      "slots": []
+    },
+    {
+      "name": "Surrender",
+      "samples": [
+        "I give up",
+        "I surrend",
+        "what was the word",
+        "what is the word"
+      ],
+      "slots": []
+    },
+    {
+      "name": "TryLetter",
+      "samples": [
+        "{Letter}",
+        "try with {Letter}",
+        "letter {Letter}"
+      ],
+      "slots": [
+        {
+          "name": "Letter",
+          "type": "LIST_OF_LETTER",
+          "samples": [
+            "{Letter} "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TryLetterAlpha",
+      "samples": [
+        "{LetterAlpha}",
+        "try {LetterAlpha}"
+      ],
+      "slots": [
+        {
+          "name": "LetterAlpha",
+          "type": "LIST_OF_LETTER_ALPHA",
+          "samples": [
+            "{LetterAlpha} "
+          ]
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "LIST_OF_LETTER",
+      "values": [
+        {
+          "name": {
+            "value": "a."
+          }
+        },
+        {
+          "name": {
+            "value": "b."
+          }
+        },
+        {
+          "name": {
+            "value": "c."
+          }
+        },
+        {
+          "name": {
+            "value": "d."
+          }
+        },
+        {
+          "name": {
+            "value": "e."
+          }
+        },
+        {
+          "name": {
+            "value": "f."
+          }
+        },
+        {
+          "name": {
+            "value": "g."
+          }
+        },
+        {
+          "name": {
+            "value": "h."
+          }
+        },
+        {
+          "name": {
+            "value": "i."
+          }
+        },
+        {
+          "name": {
+            "value": "j."
+          }
+        },
+        {
+          "name": {
+            "value": "k."
+          }
+        },
+        {
+          "name": {
+            "value": "l."
+          }
+        },
+        {
+          "name": {
+            "value": "m."
+          }
+        },
+        {
+          "name": {
+            "value": "n."
+          }
+        },
+        {
+          "name": {
+            "value": "o."
+          }
+        },
+        {
+          "name": {
+            "value": "p."
+          }
+        },
+        {
+          "name": {
+            "value": "q."
+          }
+        },
+        {
+          "name": {
+            "value": "r."
+          }
+        },
+        {
+          "name": {
+            "value": "s."
+          }
+        },
+        {
+          "name": {
+            "value": "t."
+          }
+        },
+        {
+          "name": {
+            "value": "u."
+          }
+        },
+        {
+          "name": {
+            "value": "v."
+          }
+        },
+        {
+          "name": {
+            "value": "x."
+          }
+        },
+        {
+          "name": {
+            "value": "y."
+          }
+        },
+        {
+          "name": {
+            "value": "w."
+          }
+        },
+        {
+          "name": {
+            "value": "z."
+          }
+        }
+      ]
+    },
+    {
+      "name": "LIST_OF_LETTER_ALPHA",
+      "values": [
+        {
+          "name": {
+            "value": "Alfa"
+          }
+        },
+        {
+          "name": {
+            "value": "Bravo"
+          }
+        },
+        {
+          "name": {
+            "value": "Charlie"
+          }
+        },
+        {
+          "name": {
+            "value": "Delta"
+          }
+        },
+        {
+          "name": {
+            "value": "Echo"
+          }
+        },
+        {
+          "name": {
+            "value": "Foxtrot"
+          }
+        },
+        {
+          "name": {
+            "value": "Golf"
+          }
+        },
+        {
+          "name": {
+            "value": "Hotel"
+          }
+        },
+        {
+          "name": {
+            "value": "India"
+          }
+        },
+        {
+          "name": {
+            "value": "Juliett"
+          }
+        },
+        {
+          "name": {
+            "value": "Kilo"
+          }
+        },
+        {
+          "name": {
+            "value": "Lima"
+          }
+        },
+        {
+          "name": {
+            "value": "Mike"
+          }
+        },
+        {
+          "name": {
+            "value": "November"
+          }
+        },
+        {
+          "name": {
+            "value": "Oscar"
+          }
+        },
+        {
+          "name": {
+            "value": "Papa"
+          }
+        },
+        {
+          "name": {
+            "value": "Quebec"
+          }
+        },
+        {
+          "name": {
+            "value": "Romeo"
+          }
+        },
+        {
+          "name": {
+            "value": "Sierra"
+          }
+        },
+        {
+          "name": {
+            "value": "Tango"
+          }
+        },
+        {
+          "name": {
+            "value": "Uniform"
+          }
+        },
+        {
+          "name": {
+            "value": "Victor"
+          }
+        },
+        {
+          "name": {
+            "value": "Whiskey"
+          }
+        },
+        {
+          "name": {
+            "value": "X-ray"
+          }
+        },
+        {
+          "name": {
+            "value": "Yankee"
+          }
+        },
+        {
+          "name": {
+            "value": "Zulu"
+          }
+        }
+      ]
+    }
+  ],
+  "prompts": [
+    {
+      "id": "Elicit.Intent-TryLetter.IntentSlot-Letter",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "What letter you want to try?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-TryLetterAlpha.IntentSlot-LetterAlpha",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "What letter you want to try"
+        }
+      ]
+    }
+  ],
+  "dialog": {
+    "version": "1.0",
+    "intents": [
+      {
+        "name": "Explain",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": []
+      },
+      {
+        "name": "Point",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": []
+      },
+      {
+        "name": "Surrender",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": []
+      },
+      {
+        "name": "TryLetter",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "Letter",
+            "type": "LIST_OF_LETTER",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-TryLetter.IntentSlot-Letter"
+            }
+          }
+        ]
+      },
+      {
+        "name": "TryLetterAlpha",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "LetterAlpha",
+            "type": "LIST_OF_LETTER_ALPHA",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-TryLetterAlpha.IntentSlot-LetterAlpha"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
