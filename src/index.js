@@ -36,6 +36,22 @@ var handlers = {
             handleTryLetter(letter, this);
         }
     },
+    'TryLetterAlpha': function () {
+        if (this.event.request.dialogState === 'STARTED') {
+            var updatedIntent = this.event.request.intent;
+            // Pre-fill slots: update the intent object with slot values for which
+            // you have defaults, then emit :delegate with this updated intent.
+            //updatedIntent.slots.SlotName.value = 'DefaultValue';
+            this.emit(':delegate', updatedIntent);
+        } else if (this.event.request.dialogState !== undefined && this.event.request.dialogState !== 'COMPLETED'){
+            this.emit(':delegate');
+        } else {
+            // All the slots are filled (And confirmed if you choose to confirm slot/intent)
+            var letterAlpha = isSlotValid(this.event.request, "LetterAlpha");
+            var letter = convertAlphaToLetter(letterAlpha)
+            handleTryLetter(letter, this);
+        }
+    },
     'AMAZON.HelpIntent': function () {
         speechOutput = "";
         reprompt = "";
@@ -77,27 +93,26 @@ function handleTryLetter(letter, alexaThis) {
         }
 
         var speechOutput = "";
-        //speechOutput = "You already tried letter <say-as interpret-as=\"spell-out\">" + letter + "</say-as>.  Please try a new one";
 
         switch (game.tryLetter(letter)) {
             case HangmanGame.tryLetterResult.won:
-                speechOutput = "You won";
+                speechOutput = `You won. The secret word was ${game.secret}`;
                 break;
         
             case HangmanGame.tryLetterResult.lost:
-                speechOutput = "You lost";
+                speechOutput = `Sorry you lost. The secret word was ${game.secret}`;
                 break;
         
             case HangmanGame.tryLetterResult.alreadyTried:
-                speechOutput = "You already tried";
+                speechOutput = `You already tried the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>.  Please try a new one`;
                 break;
         
             case HangmanGame.tryLetterResult.found:
-                speechOutput = "Letter founded";
+                speechOutput = `Good. The secret word contain the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>.  Try to cach a new letter now`;
                 break;
         
             case HangmanGame.tryLetterResult.notFound:
-                speechOutput = "Letter not founded";
+                speechOutput = `Sorry. The secret word didn't contain the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>. Please try a new one`;
                 break;
         
             default:
@@ -114,6 +129,38 @@ function handleTryLetter(letter, alexaThis) {
     }
 }
 
+function convertAlphaToLetter(letterAlpha) {
+    // var converter = {
+    //     'alfa' : 'a',
+    //     'bravo' : 'b',
+    //     'charlie' : 'c',
+    //     'delta' : 'd',
+    //     'echo' : 'e',
+    //     'foxtrot' : 'f',
+    //     'golf' : 'g',
+    //     'hotel' : 'h',
+    //     'india' : 'i',
+    //     'juliett' : 'j',
+    //     'kilo' : 'k',
+    //     'lima' : 'l',
+    //     'mike' : 'm',
+    //     'november' : 'n',
+    //     'oscar' : 'o',
+    //     'papa' : 'p',
+    //     'quebec' : 'q',
+    //     'romeo' : 'r',
+    //     'sierra' : 's',
+    //     'tango' : 't',
+    //     'uniform' : 'u',
+    //     'victor' : 'v',
+    //     'whiskey' : 'w',
+    //     'x-ray' : 'x',
+    //     'yankee' : 'y',
+    //     'zulu' : 'z'};
+
+    // return converter[letterAlpha];
+    return letterAlpha.substring(0, 1);
+}
 
 // Helper Function  =================================================================================================
 
