@@ -22,57 +22,18 @@ var handlers = {
         this.emit(':ask', welcomeOutput, welcomeReprompt);
     },
     'TryLetter': function () {
-        //delegate to Alexa to collect all the required slot values
-        //var filledSlots = delegateSlotCollection.call(this);
-
-        var letter = isSlotValid(this.event.request, "Letter");
-
-        if (letter) {
-
-            var game = new HangmanGame.HangmanGame();
-
-            if (this.attributes['persistedGame'] == undefined) {
-                game.loadFromString(getNewGame());
-            }
-            else {
-                game.loadFromString(this.attributes['persistedGame']);
-            }
-
-            var speechOutput = "";
-            //speechOutput = "You already tried letter <say-as interpret-as=\"spell-out\">" + letter + "</say-as>.  Please try a new one";
-
-            switch (game.tryLetter(letter)) {
-                case HangmanGame.tryLetterResult.won:
-                    speechOutput = "You won";
-                    break;
-            
-                case HangmanGame.tryLetterResult.lost:
-                    speechOutput = "You lost";
-                    break;
-            
-                case HangmanGame.tryLetterResult.alreadyTried:
-                    speechOutput = "You already tried";
-                    break;
-            
-                case HangmanGame.tryLetterResult.found:
-                    speechOutput = "Letter founded";
-                    break;
-            
-                case HangmanGame.tryLetterResult.notFound:
-                    speechOutput = "Letter not founded";
-                    break;
-            
-                default:
-                    speechOutput = "Error";
-                    break;
-            }
-
-            this.attributes['persistedGame'] = game.saveToString();
-
-            this.emit(':ask', speechOutput, "Please try a new letter.");
+        if (this.event.request.dialogState === 'STARTED') {
+            var updatedIntent = this.event.request.intent;
+            // Pre-fill slots: update the intent object with slot values for which
+            // you have defaults, then emit :delegate with this updated intent.
+            //updatedIntent.slots.SlotName.value = 'DefaultValue';
+            this.emit(':delegate', updatedIntent);
+        } else if (this.event.request.dialogState !== undefined && this.event.request.dialogState !== 'COMPLETED'){
+            this.emit(':delegate');
         } else {
-            console.log("Error");
-            this.emit(":tell", 'error');
+            // All the slots are filled (And confirmed if you choose to confirm slot/intent)
+            var letter = isSlotValid(this.event.request, "Letter");
+            handleTryLetter(letter, this);
         }
     },
     'AMAZON.HelpIntent': function () {
@@ -104,30 +65,57 @@ exports.handler = (event, context) => {
 };
 
 
-// Helper Function  =================================================================================================
+function handleTryLetter(letter, alexaThis) {
+    if (letter) {
+        var game = new HangmanGame.HangmanGame();
 
-function delegateSlotCollection(){
-  console.log("in delegateSlotCollection");
-  console.log("current dialogState: "+this.event.request.dialogState);
-    if (this.event.request.dialogState === "BEGINNING") {
-      console.log("in Beginning");
-      var updatedIntent=this.event.request.intent;
-      //optionally pre-fill slots: update the intent object with slot values for which
-      //you have defaults, then return Dialog.Delegate with this updated intent
-      // in the updatedIntent property
-      this.emit(":delegate", updatedIntent);
-    } else if (this.event.request.dialogState !== "COMPLETED") {
-      console.log("in not completed");
-      // return a Dialog.Delegate directive with no updatedIntent property.
-      this.emit(":delegate");
+        if (alexaThis.attributes['persistedGame'] == undefined) {
+            game.loadFromString(getNewGame());
+        }
+        else {
+            game.loadFromString(alexaThis.attributes['persistedGame']);
+        }
+
+        var speechOutput = "";
+        //speechOutput = "You already tried letter <say-as interpret-as=\"spell-out\">" + letter + "</say-as>.  Please try a new one";
+
+        switch (game.tryLetter(letter)) {
+            case HangmanGame.tryLetterResult.won:
+                speechOutput = "You won";
+                break;
+        
+            case HangmanGame.tryLetterResult.lost:
+                speechOutput = "You lost";
+                break;
+        
+            case HangmanGame.tryLetterResult.alreadyTried:
+                speechOutput = "You already tried";
+                break;
+        
+            case HangmanGame.tryLetterResult.found:
+                speechOutput = "Letter founded";
+                break;
+        
+            case HangmanGame.tryLetterResult.notFound:
+                speechOutput = "Letter not founded";
+                break;
+        
+            default:
+                speechOutput = "Error";
+                break;
+        }
+
+        alexaThis.attributes['persistedGame'] = game.saveToString();
+
+        alexaThis.emit(':ask', speechOutput, "Please try a new letter.");
     } else {
-      console.log("in completed");
-      console.log("returning: "+ JSON.stringify(this.event.request.intent));
-      // Dialog is now complete and all required slots should be filled,
-      // so call your normal intent handler.
-      return this.event.request.intent;
+        console.log("Error");
+        alexaThis.emit(":tell", 'error');
     }
 }
+
+
+// Helper Function  =================================================================================================
 
 function isSlotValid(request, slotName){
         var slot = request.intent.slots[slotName];
