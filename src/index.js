@@ -4,26 +4,12 @@
 // Jacopo Mangiavacchi.
 
 
-var HangmanGame_1 = require("./HangmanGame");
-var game = new HangmanGame_1.HangmanGame("secret");
+var HangmanGame = require("./HangmanGame");
 
+var welcomeOutput = "Welcome to the Hangman Game Alexa Skills Kit. You need to catch the word I guessed.  Try to catch this word one letter at a time";
+var welcomeReprompt = "Try to say a letter.";
 
- // 1. Text strings =====================================================================================================
- //    Modify these strings and messages to change the behavior of your Lambda function
-
- var speechOutput;
- var reprompt;
- var welcomeOutput = "Let's plan a trip. Where would you like to go?";
- var welcomeReprompt = "Let me know where you'd like to go or when you'd like to go on your trip";
- var tripIntro = [
-   "This sounds like a cool trip. ",
-   "This will be fun. ",
-   "Oh, I like this trip. "
- ];
-
-
-
- // 2. Skill Code =======================================================================================================
+ // Skill Code =======================================================================================================
 
 'use strict';
 var Alexa = require('alexa-sdk');
@@ -31,37 +17,63 @@ var APP_ID = undefined;  // TODO replace with your app ID (OPTIONAL).
 
 var handlers = {
     'LaunchRequest': function () {
-      this.emit(':ask', welcomeOutput, welcomeReprompt);
+        this.attributes['persistedGame'] = getNewGame();
+
+        this.emit(':ask', welcomeOutput, welcomeReprompt);
     },
-    'PlanMyTrip': function () {
+    'TryLetter': function () {
         //delegate to Alexa to collect all the required slot values
-        var filledSlots = delegateSlotCollection.call(this);
+        //var filledSlots = delegateSlotCollection.call(this);
 
-        //compose speechOutput that simply reads all the collected slot values
-        var speechOutput = randomPhrase(tripIntro);
+        var letter = isSlotValid(this.event.request, "Letter");
 
-        //activity is optional so we'll add it to the output
-        //only when we have a valid activity
-        var travelMode = isSlotValid(this.event.request, "travelMode");
-        if (travelMode) {
-          speechOutput += travelMode;
+        if (letter) {
+
+            var game = new HangmanGame.HangmanGame();
+
+            if (this.attributes['persistedGame'] == undefined) {
+                game.loadFromString(getNewGame());
+            }
+            else {
+                game.loadFromString(this.attributes['persistedGame']);
+            }
+
+            var speechOutput = "";
+            //speechOutput = "You already tried letter <say-as interpret-as=\"spell-out\">" + letter + "</say-as>.  Please try a new one";
+
+            switch (game.tryLetter(letter)) {
+                case HangmanGame.tryLetterResult.won:
+                    speechOutput = "You won";
+                    break;
+            
+                case HangmanGame.tryLetterResult.lost:
+                    speechOutput = "You lost";
+                    break;
+            
+                case HangmanGame.tryLetterResult.alreadyTried:
+                    speechOutput = "You already tried";
+                    break;
+            
+                case HangmanGame.tryLetterResult.found:
+                    speechOutput = "Letter founded";
+                    break;
+            
+                case HangmanGame.tryLetterResult.notFound:
+                    speechOutput = "Letter not founded";
+                    break;
+            
+                default:
+                    speechOutput = "Error";
+                    break;
+            }
+
+            this.attributes['persistedGame'] = game.saveToString();
+
+            this.emit(':ask', speechOutput, "Please try a new letter.");
         } else {
-          speechOutput += "You'll go ";
+            console.log("Error");
+            this.emit(":tell", 'error');
         }
-
-        //Now let's recap the trip
-        var fromCity=this.event.request.intent.slots.fromCity.value;
-        var toCity=this.event.request.intent.slots.toCity.value;
-        var travelDate=this.event.request.intent.slots.travelDate.value;
-        speechOutput+= " from "+ fromCity + " to "+ toCity+" on "+travelDate;
-
-        var activity = isSlotValid(this.event.request, "activity");
-        if (activity) {
-          speechOutput += " to go "+ activity;
-        }
-
-        //say the results
-        this.emit(":tell",speechOutput);
     },
     'AMAZON.HelpIntent': function () {
         speechOutput = "";
@@ -91,8 +103,8 @@ exports.handler = (event, context) => {
     alexa.execute();
 };
 
-//    END of Intent Handlers {} ========================================================================================
-// 3. Helper Function  =================================================================================================
+
+// Helper Function  =================================================================================================
 
 function delegateSlotCollection(){
   console.log("in delegateSlotCollection");
@@ -117,12 +129,6 @@ function delegateSlotCollection(){
     }
 }
 
-function randomPhrase(array) {
-    // the argument is an array [] of words or phrases
-    var i = 0;
-    i = Math.floor(Math.random() * array.length);
-    return(array[i]);
-}
 function isSlotValid(request, slotName){
         var slot = request.intent.slots[slotName];
         //console.log("request = "+JSON.stringify(request)); //uncomment if you want to see the request
@@ -137,4 +143,13 @@ function isSlotValid(request, slotName){
             //we didn't get a value in the slot.
             return false;
         }
+}
+
+
+function getNewGame() {
+    var secret = "secret";
+
+    var game = new HangmanGame.HangmanGame(secret);
+
+    return game.saveToString();
 }
