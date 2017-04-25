@@ -13,10 +13,11 @@
   "author": "Jacopo Mangiavacchi",
   "license": "SEE LICENSE IN LICENSE.txt",
   "dependencies": {
-    "alexa-sdk": "^1.0.8"
+    "alexa-sdk": "^1.0.8",
+    "request": "^2.81.0"
   },
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/JacopoMangiavacchi/Hangman-Alexa-Skill"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JacopoMangiavacchi/Hangman-Alexa-Skill"
   }
 }

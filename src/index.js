@@ -17,9 +17,17 @@ var APP_ID = undefined;  // TODO replace with your app ID (OPTIONAL).
 
 var handlers = {
     'LaunchRequest': function () {
-        this.attributes['persistedGame'] = getNewGame();
-
-        this.emit(':ask', welcomeOutput, welcomeReprompt);
+        getSecret( (secret) => {
+            var game = new HangmanGame.HangmanGame(secret);
+            this.attributes['persistedGame'] = game.saveToString();
+            this.emit(':ask', welcomeOutput, welcomeReprompt);
+        });
+    },
+    'Surrender': function () {
+        var game = new HangmanGame.HangmanGame();
+        game.loadFromString(this.attributes['persistedGame']);
+        console.log(`The secret word is ${game.secret}`)
+        this.emit(':ask', `The secret word was ${game.secret}`);
     },
     'TryLetter': function () {
         if (this.event.request.dialogState === 'STARTED') {
@@ -86,7 +94,7 @@ function handleTryLetter(letter, alexaThis) {
         var game = new HangmanGame.HangmanGame();
 
         if (alexaThis.attributes['persistedGame'] == undefined) {
-            game.loadFromString(getNewGame());
+            console.log('ERROR - Try Letter called without creating the game first')
         }
         else {
             game.loadFromString(alexaThis.attributes['persistedGame']);
@@ -181,10 +189,13 @@ function isSlotValid(request, slotName){
 }
 
 
-function getNewGame() {
-    var secret = "secret";
+function getSecret(callback) {
+    var url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&minCorpusCount=0&minLength=5&maxLength=15&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
 
-    var game = new HangmanGame.HangmanGame(secret);
-
-    return game.saveToString();
+    var request = require('request');
+    request(url, function (error, response, body) {
+        var jsonBody = JSON.parse(body);
+        var secret = jsonBody[0].word;
+        callback(secret);
+    });
 }
