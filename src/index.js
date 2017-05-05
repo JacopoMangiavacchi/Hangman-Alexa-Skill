@@ -63,8 +63,11 @@ var handlers = {
     'Explain': function () {
         var game = new HangmanGame.HangmanGame();
         game.loadFromString(this.attributes['persistedGame']);
-        console.log(`The secret word is ${game.secret}`)
-        this.emit(':ask', `The secret word is ${game.secret}`);
+
+        getDefinition(game.secret, (definition) => {
+            console.log(`The definition of the secret word is ${definition}.  Try to cach a new letter now`)
+            this.emit(':ask', `The definition of the secret word is ${definition}.  Try to cach a new letter now`);
+        });
     },
     'Point': function () {
         var game = new HangmanGame.HangmanGame();
@@ -209,5 +212,16 @@ function getSecret(callback) {
         var jsonBody = JSON.parse(body);
         var secret = jsonBody[0].word;
         callback(secret);
+    });
+}
+
+function getDefinition(secret, callback) {
+    var url = `http://api.wordnik.com/v4/word.json/${secret}/definitions?api_key=${process.env.WORDNIK_APIKEY}`
+
+    var request = require('request');
+    request(url, function (error, response, body) {
+        var jsonBody = JSON.parse(body);
+        var definition = jsonBody[0].text;
+        callback(definition);
     });
 }
