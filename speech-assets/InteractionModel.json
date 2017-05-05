@@ -18,7 +18,9 @@
         "tell me more about the word",
         "tell me about the word",
         "what does it mean",
-        "what is the meaning"
+        "what is the meaning",
+        "please explain",
+        "explain"
       ],
       "slots": []
     },
@@ -42,7 +44,6 @@
     {
       "name": "TryLetter",
       "samples": [
-        "{Letter}",
         "try with {Letter}",
         "letter {Letter}"
       ],
@@ -59,7 +60,6 @@
     {
       "name": "TryLetterAlpha",
       "samples": [
-        "{LetterAlpha}",
         "try {LetterAlpha}"
       ],
       "slots": [

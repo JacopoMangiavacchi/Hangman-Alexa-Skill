@@ -60,6 +60,18 @@ var handlers = {
             handleTryLetter(letter, this);
         }
     },
+    'Explain': function () {
+        var game = new HangmanGame.HangmanGame();
+        game.loadFromString(this.attributes['persistedGame']);
+        console.log(`The secret word is ${game.secret}`)
+        this.emit(':ask', `The secret word is ${game.secret}`);
+    },
+    'Point': function () {
+        var game = new HangmanGame.HangmanGame();
+        game.loadFromString(this.attributes['persistedGame']);
+        console.log(`You unsuccesfully tried ${game.failedAttempts} time and discovered ${game.lettersTried.length} letters`)
+        this.emit(':ask', `You unsuccesfully tried ${game.failedAttempts} time and discovered ${game.lettersTried.length} letters`);
+    },
     'AMAZON.HelpIntent': function () {
         speechOutput = "";
         reprompt = "";
