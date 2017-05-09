@@ -20,6 +20,7 @@ var handlers = {
         getSecret( (secret) => {
             var game = new HangmanGame.HangmanGame(secret);
             this.attributes['persistedGame'] = game.saveToString();
+            this.emit(':saveState', true);
             this.emit(':ask', welcomeOutput, welcomeReprompt);
         });
     },
@@ -99,6 +100,7 @@ exports.handler = (event, context) => {
     alexa.APP_ID = APP_ID;
     // To enable string internationalization (i18n) features, set a resources object.
     //alexa.resources = languageStrings;
+    alexa.dynamoDBTableName = 'Hangman';
     alexa.registerHandlers(handlers);
     alexa.execute();
 };
@@ -144,7 +146,7 @@ function handleTryLetter(letter, alexaThis) {
         }
 
         alexaThis.attributes['persistedGame'] = game.saveToString();
-
+        alexaThis.emit(':saveState', true);
         alexaThis.emit(':ask', speechOutput, "Please try a new letter.");
     } else {
         console.log("Error");
