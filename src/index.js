@@ -6,8 +6,12 @@
 
 var HangmanGame = require("./HangmanGame");
 
-var welcomeOutput = "Welcome to the Hangman Game Alexa Skills Kit. You need to catch the word I guessed.  Try to catch this word one letter at a time";
+var welcomeOutput = "Welcome to the Hangman Game Alexa Skills Kit. You need to catch the secret word I guessed.  Try to catch this word one letter at a time";
+var welcomeBackOutput1 = "Welcome back to the Hangman Game Alexa Skills Kit. I'm resuming this game from the previous session. ";
+var welcomeBackOutput2 = "Now try to catch the secret word one letter at a time";
+var newGameOutput = "Let's start another game now.  Try to catch the new secret word one letter at a time";
 var welcomeReprompt = "Try to say a letter.";
+var pauseString = " <break time=\"1s\"/> ";
 
  // Skill Code =======================================================================================================
 
@@ -17,18 +21,30 @@ var APP_ID = undefined;  // TODO replace with your app ID (OPTIONAL).
 
 var handlers = {
     'LaunchRequest': function () {
-        getSecret( (secret) => {
-            var game = new HangmanGame.HangmanGame(secret);
-            this.attributes['persistedGame'] = game.saveToString();
-            this.emit(':saveState', true);
-            this.emit(':ask', welcomeOutput, welcomeReprompt);
-        });
+        if (this.attributes['persistedGame'] == undefined) {
+            getSecret( (secret) => {
+                var game = new HangmanGame.HangmanGame(secret);
+                this.attributes['persistedGame'] = game.saveToString();
+                this.emit(':saveState', true);
+                this.emit(':ask', welcomeOutput, welcomeReprompt);
+            });
+        }
+        else {
+            var pointMessage = getPoint(this);
+            this.emit(':ask', welcomeBackOutput1 + pointMessage + pauseString + welcomeBackOutput2, welcomeReprompt);
+        }
     },
     'Surrender': function () {
         var game = new HangmanGame.HangmanGame();
         game.loadFromString(this.attributes['persistedGame']);
-        console.log(`The secret word is ${game.secret}`)
-        this.emit(':ask', `The secret word was ${game.secret}`);
+        var oldSecret = game.secret
+        console.log(`The secret word was ${oldSecret}`)
+        getSecret( (secret) => {
+            var game = new HangmanGame.HangmanGame(secret);
+            this.attributes['persistedGame'] = game.saveToString();
+            this.emit(':saveState', true);
+            this.emit(':ask', `The secret word was ${oldSecret}` + pauseString + newGameOutput, welcomeReprompt);
+        });
     },
     'TryLetter': function () {
         if (this.event.request.dialogState === 'STARTED') {
@@ -67,14 +83,12 @@ var handlers = {
 
         getDefinition(game.secret, (definition) => {
             console.log(`The definition of the secret word is ${definition}.  Try to cach a new letter now`)
-            this.emit(':ask', `The definition of the secret word is ${definition}.  Try to cach a new letter now`);
+            this.emit(':ask', `The definition of the secret word is <break time="1s"/> ${definition}. <break time="2s"/> Try to cach a new letter now`);
         });
     },
     'Point': function () {
-        var game = new HangmanGame.HangmanGame();
-        game.loadFromString(this.attributes['persistedGame']);
-        console.log(`You unsuccesfully tried ${game.failedAttempts} time and discovered ${game.lettersTried.length} letters`)
-        this.emit(':ask', `You unsuccesfully tried ${game.failedAttempts} time and discovered ${game.lettersTried.length} letters`);
+        var pointMessage = getPoint(this);
+        this.emit(':ask', pointMessage + pauseString + welcomeBackOutput2, welcomeReprompt);
     },
     'AMAZON.HelpIntent': function () {
         speechOutput = "";
@@ -91,8 +105,14 @@ var handlers = {
     },
     'SessionEndedRequest': function () {
         var speechOutput = "";
+        this.emit(':saveState', true);
         this.emit(':tell', speechOutput);
     },
+    ':saveStateError': function () {
+        console.log('ERROR - :saveStateError')
+        var speechOutput = "";
+        this.emit(':tell', speechOutput);
+    }
 };
 
 exports.handler = (event, context) => {
@@ -226,4 +246,12 @@ function getDefinition(secret, callback) {
         var definition = jsonBody[0].text;
         callback(definition);
     });
+}
+
+
+function getPoint(alexaThis) {
+    var game = new HangmanGame.HangmanGame();
+    game.loadFromString(alexaThis.attributes['persistedGame']);
+    var pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered ${game.lettersTried.length} letters`
+    return pointMessage
 }
