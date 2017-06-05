@@ -58,23 +58,13 @@ var handlers = {
         } else {
             // All the slots are filled (And confirmed if you choose to confirm slot/intent)
             var letter = isSlotValid(this.event.request, "Letter");
-            handleTryLetter(letter, this);
-        }
-    },
-    'TryLetterAlpha': function () {
-        if (this.event.request.dialogState === 'STARTED') {
-            var updatedIntent = this.event.request.intent;
-            // Pre-fill slots: update the intent object with slot values for which
-            // you have defaults, then emit :delegate with this updated intent.
-            //updatedIntent.slots.SlotName.value = 'DefaultValue';
-            this.emit(':delegate', updatedIntent);
-        } else if (this.event.request.dialogState !== undefined && this.event.request.dialogState !== 'COMPLETED'){
-            this.emit(':delegate');
-        } else {
-            // All the slots are filled (And confirmed if you choose to confirm slot/intent)
-            var letterAlpha = isSlotValid(this.event.request, "LetterAlpha");
-            var letter = convertAlphaToLetter(letterAlpha)
-            handleTryLetter(letter, this);
+            if (letter == false) {
+                console.log("Slot not recognized");
+                this.emit(':ask', "Sorry, I don't understand what letter you want to try", "Please try a new letter.");
+            }
+            else {
+                handleTryLetter(letter, this);
+            }
         }
     },
     'Explain': function () {
@@ -161,7 +151,7 @@ function handleTryLetter(letter, alexaThis) {
                 break;
         
             default:
-                speechOutput = "Error";
+                speechOutput = "Error on TryLetter";
                 break;
         }
 
@@ -218,7 +208,7 @@ function isSlotValid(request, slotName){
         if (slot && slot.value) {
             //we have a value in the slot
             slotValue = slot.value.toLowerCase();
-            return slotValue;
+            return slotValue.substring(0, 1);
         } else {
             //we didn't get a value in the slot.
             return false;

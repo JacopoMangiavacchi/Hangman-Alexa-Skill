@@ -18,7 +18,9 @@
         "tell me more about the word",
         "tell me about the word",
         "what does it mean",
-        "what is the meaning"
+        "what is the meaning",
+        "please explain",
+        "explain"
       ],
       "slots": []
     },
@@ -26,10 +28,10 @@
       "name": "Point",
       "samples": [
         "what are the points",
-        "what is the point",
-        "how am I going",
-        "how many letters",
-        "how many error"
+        "how many letters did I guessed",
+        "recap",
+        "how is the game",
+        "how am I going"
       ],
       "slots": []
     },
@@ -38,12 +40,9 @@
       "samples": [
         "I give up",
         "I surrend",
-        "what was the word",
-        "what is the word",
         "I quit",
-        "start a new game",
-        "let start a new game",
-        "reset"
+        "Play a new game",
+        "New game"
       ],
       "slots": []
     },
@@ -52,6 +51,8 @@
       "samples": [
         "try with {Letter}",
         "letter {Letter}",
+        "try letter {Letter}",
+        "does it contain {Letter}",
         "try {Letter}"
       ],
       "slots": [
@@ -60,22 +61,6 @@
           "type": "LIST_OF_LETTER",
           "samples": [
             "{Letter} "
-          ]
-        }
-      ]
-    },
-    {
-      "name": "TryLetterAlpha",
-      "samples": [
-        "try {LetterAlpha}",
-        "try with {LetterAlpha}"
-      ],
-      "slots": [
-        {
-          "name": "LetterAlpha",
-          "type": "LIST_OF_LETTER_ALPHA",
-          "samples": [
-            "{LetterAlpha} "
           ]
         }
       ]
@@ -214,12 +199,7 @@
           "name": {
             "value": "z."
           }
-        }
-      ]
-    },
-    {
-      "name": "LIST_OF_LETTER_ALPHA",
-      "values": [
+        },
         {
           "name": {
             "value": "Alfa"
@@ -364,17 +344,6 @@
           "value": "What letter you want to try?"
         }
       ]
-    },
-    {
-      "id": "Elicit.Intent-TryLetterAlpha.IntentSlot-LetterAlpha",
-      "promptVersion": "1.0",
-      "definitionVersion": "1.0",
-      "variations": [
-        {
-          "type": "PlainText",
-          "value": "What letter you want to try"
-        }
-      ]
     }
   ],
   "dialog": {
@@ -410,22 +379,6 @@
             "confirmationRequired": false,
             "prompts": {
               "elicit": "Elicit.Intent-TryLetter.IntentSlot-Letter"
-            }
-          }
-        ]
-      },
-      {
-        "name": "TryLetterAlpha",
-        "confirmationRequired": false,
-        "prompts": {},
-        "slots": [
-          {
-            "name": "LetterAlpha",
-            "type": "LIST_OF_LETTER_ALPHA",
-            "elicitationRequired": true,
-            "confirmationRequired": false,
-            "prompts": {
-              "elicit": "Elicit.Intent-TryLetterAlpha.IntentSlot-LetterAlpha"
             }
           }
         ]
