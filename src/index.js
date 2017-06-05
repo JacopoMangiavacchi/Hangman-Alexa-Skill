@@ -83,7 +83,7 @@ var handlers = {
     'AMAZON.HelpIntent': function () {
         speechOutput = "";
         reprompt = "";
-        this.emit(':ask', speechOutput, reprompt);
+        this.emit(':ask', 'Try to catch the secret word saying for example <break time="1s"/> Try letter <say-as interpret-as=\"spell-out\">a</say-as>', "Please try a new letter now.");
     },
     'AMAZON.CancelIntent': function () {
         speechOutput = "";
@@ -102,6 +102,10 @@ var handlers = {
         console.log('ERROR - :saveStateError')
         var speechOutput = "";
         this.emit(':tell', speechOutput);
+    },
+    'Unhandled': function() {
+        console.log('Unhandled Intent!')
+        this.emit(':ask', 'Sorry, I didn\'t get that. Try to catch the secret word saying for example <break time="1s"/> Try letter <say-as interpret-as=\"spell-out\">a</say-as>', "Please try a new letter now.");
     }
 };
 

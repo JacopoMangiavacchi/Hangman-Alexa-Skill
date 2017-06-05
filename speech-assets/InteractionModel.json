@@ -64,6 +64,16 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Unhandled",
+      "samples": [
+        "How does it work",
+        "What I have to say",
+        "What I have to do",
+        "Unhandled"
+      ],
+      "slots": []
     }
   ],
   "types": [
@@ -382,6 +392,12 @@
             }
           }
         ]
+      },
+      {
+        "name": "Unhandled",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": []
       }
     ]
   }
