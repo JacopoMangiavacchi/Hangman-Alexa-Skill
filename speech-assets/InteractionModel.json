@@ -25,6 +25,24 @@
       "slots": []
     },
     {
+      "name": "Guess",
+      "samples": [
+        "Is the word {word}",
+        "Is the secret word {word}",
+        "Is this {word}",
+        "I want to guess the word"
+      ],
+      "slots": [
+        {
+          "name": "word",
+          "type": "LIST_OF_LETTER",
+          "samples": [
+            "{word}"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Point",
       "samples": [
         "what are the points",
@@ -345,6 +363,43 @@
   ],
   "prompts": [
     {
+      "id": "Confirm.Intent-Guess",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Do you want to guess the word {word} ?"
+        },
+        {
+          "type": "PlainText",
+          "value": "Is the word you want to guess {word} ?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-Guess.IntentSlot-word",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Please specify the word you are guessing"
+        }
+      ]
+    },
+    {
+      "id": "Confirm.Intent-Guess.IntentSlot-word",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Are you sure the word you want to guess is {word} ?"
+        }
+      ]
+    },
+    {
       "id": "Elicit.Intent-TryLetter.IntentSlot-Letter",
       "promptVersion": "1.0",
       "definitionVersion": "1.0",
@@ -364,6 +419,25 @@
         "confirmationRequired": false,
         "prompts": {},
         "slots": []
+      },
+      {
+        "name": "Guess",
+        "confirmationRequired": true,
+        "prompts": {
+          "confirm": "Confirm.Intent-Guess"
+        },
+        "slots": [
+          {
+            "name": "word",
+            "type": "LIST_OF_LETTER",
+            "elicitationRequired": true,
+            "confirmationRequired": true,
+            "prompts": {
+              "elicit": "Elicit.Intent-Guess.IntentSlot-word",
+              "confirm": "Confirm.Intent-Guess.IntentSlot-word"
+            }
+          }
+        ]
       },
       {
         "name": "Point",
