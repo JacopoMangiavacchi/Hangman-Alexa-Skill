@@ -84,7 +84,7 @@ var handlers = {
                 this.emit(':ask', "Sorry, I don't understand what word you want to try", "Please try a new letter.");
             }
             else {
-                this.emit(':ask', `Your guessing word is ${word}`, "Please try a new letter.");
+                handleTryWord(word, this);
             }
         }
     },
@@ -186,6 +186,34 @@ function handleTryLetter(letter, alexaThis) {
     } else {
         console.log("Error");
         alexaThis.emit(":tell", 'error');
+    }
+}
+
+
+function handleTryWord(word, alexaThis) {
+    if (word) {
+        var game = new HangmanGame.HangmanGame();
+
+        if (alexaThis.attributes['persistedGame'] == undefined) {
+            console.log('ERROR - Try Letter called without creating the game first')
+        }
+        else {
+            game.loadFromString(alexaThis.attributes['persistedGame']);
+        }
+
+
+        if (word == game.secret) {
+            alexaThis.attributes['persistedGame'] = game.saveToString();
+            alexaThis.emit(':saveState', true);
+            alexaThis.emit(':ask', `You won. The secret word was ${game.secret}`, "Please try a new letter.");
+        }
+        else {
+            alexaThis.emit(':ask', `Sorry.  The secret word is not ${word}`, "Please try a new letter.");
+        }
+
+    } else {
+        console.log("Error2");
+        alexaThis.emit(":tell", 'error2');
     }
 }
 
