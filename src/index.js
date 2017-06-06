@@ -273,12 +273,13 @@ function getPoint(alexaThis) {
         pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered no letters`;
     }
     else if (points === 1) {
-        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered the letter <say-as interpret-as=\"spell-out\">${game.lettersTried.substring(0, 1)}</say-as> `;
+        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered the letter <break time="0.5s"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substring(0, 1)}</say-as> `;
     }
     else {
-        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered ${points} letters. The discovered letters are `;
+        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered ${points} letters <break time="0.5s"/>`;
 
         for (i = 0; i <= points; i++) { 
+            pointMessage += " and "
             pointMessage += ` <say-as interpret-as=\"spell-out\">${game.lettersTried.substring(i, 1)}</say-as> <break time="0.5s"/> `
         }
     }
