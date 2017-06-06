@@ -11,7 +11,7 @@ var welcomeBackOutput1 = "Welcome back to the Hangman Game Alexa Skills Kit. I'm
 var welcomeBackOutput2 = "Now try to catch the secret word one letter at a time";
 var newGameOutput = "Let's start another game now.  Try to catch the new secret word one letter at a time";
 var welcomeReprompt = "Try to say a letter.";
-var pauseString = " <break time=\"1s\"/> ";
+var pauseString = ` <break time="1s"/> `;
 
  // Skill Code =======================================================================================================
 
@@ -43,7 +43,7 @@ var handlers = {
             var game = new HangmanGame.HangmanGame(secret);
             this.attributes['persistedGame'] = game.saveToString();
             this.emit(':saveState', true);
-            this.emit(':ask', `The secret word was ${oldSecret}` + pauseString + newGameOutput, welcomeReprompt);
+            this.emit(':ask', `The secret word was <emphasis level="strong">${oldSecret}</emphasis>` + pauseString + newGameOutput, welcomeReprompt);
         });
     },
     'TryLetter': function () {
@@ -79,8 +79,8 @@ var handlers = {
         game.loadFromString(this.attributes['persistedGame']);
 
         getDefinition(game.secret, (definition) => {
-            console.log(`The definition of the secret word is ${definition}.  Try to cach a new letter now`)
-            this.emit(':ask', `The definition of the secret word is <break time="1s"/> ${definition}. <break time="2s"/> Try to cach a new letter now`);
+            //console.log(`The definition of the secret word is ${definition}.  Try to cach a new letter now`)
+            this.emit(':ask', `The definition of the secret word is <break time="1s"/> <emphasis level="strong">${definition}</emphasis>. <break time="2s"/> Try to cach a new letter now`);
         });
     },
     'Point': function () {
@@ -143,25 +143,25 @@ function handleTryLetter(letter, alexaThis) {
 
         switch (game.tryLetter(letter)) {
             case HangmanGame.tryLetterResult.won:
-                speechOutput = `You won. The secret word was ${game.secret}`;
+                speechOutput = `<say-as interpret-as="interjection">bingo!</say-as> You won. The secret word was ${game.secret}`;
                 endOfGame = true;
                 break;
         
             case HangmanGame.tryLetterResult.lost:
-                speechOutput = `Sorry you lost. The secret word was ${game.secret}`;
+                speechOutput = `<say-as interpret-as="interjection">sigh!</say-as> Sorry you lost. The secret word was ${game.secret}`;
                 endOfGame = true;
                 break;
         
             case HangmanGame.tryLetterResult.alreadyTried:
-                speechOutput = `You already tried the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>.  Please try a new one`;
+                speechOutput = `<say-as interpret-as="interjection">honk!</say-as> You already tried the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>.  Please try a new one`;
                 break;
         
             case HangmanGame.tryLetterResult.found:
-                speechOutput = `Good. The secret word contain the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>.  Try to cach a new letter now`;
+                speechOutput = `<say-as interpret-as="interjection">ha!</say-as> The secret word contain the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>.  Try to cach a new letter now`;
                 break;
         
             case HangmanGame.tryLetterResult.notFound:
-                speechOutput = `Sorry. The secret word didn't contain the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>. Please try a new one`;
+                speechOutput = `<say-as interpret-as="interjection">moo!</say-as> Sorry, the secret word didn't contain the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>. Please try a new one`;
                 break;
         
             default:
@@ -175,7 +175,7 @@ function handleTryLetter(letter, alexaThis) {
                 var newGame = new HangmanGame.HangmanGame(secret);
                 alexaThis.attributes['persistedGame'] = newGame.saveToString();
                 alexaThis.emit(':saveState', true);
-                alexaThis.emit(':ask', `You won. The secret word was ${word}. <break time="1s"/> Try to catch a new word now. Please try a letter`, welcomeReprompt);
+                alexaThis.emit(':ask', `You won. The secret word was <emphasis level="strong">${word}</emphasis>. <break time="1s"/> Try to catch a new word now. Please try a letter`, welcomeReprompt);
             });
         }
         else {
@@ -206,11 +206,11 @@ function handleTryWord(word, alexaThis) {
                 var newGame = new HangmanGame.HangmanGame(secret);
                 alexaThis.attributes['persistedGame'] = newGame.saveToString();
                 alexaThis.emit(':saveState', true);
-                alexaThis.emit(':ask', `You won. The secret word was ${word}. <break time="1s"/> Try to catch a new word now. Please try a letter`, welcomeReprompt);
+                alexaThis.emit(':ask', `<say-as interpret-as="interjection">bingo!</say-as> You won. The secret word was <emphasis level="strong">${word}</emphasis>. <break time="1s"/> Try to catch a new word now. Please try a letter`, welcomeReprompt);
             });
         }
         else {
-            alexaThis.emit(':ask', `Sorry.  The secret word is not ${word}`, "Please try a new letter.");
+            alexaThis.emit(':ask', `<say-as interpret-as="interjection">sigh!</say-as> Sorry.  The secret word is not <emphasis level="strong">${word}</emphasis>`, "Please try a new letter.");
         }
 
     } else {
@@ -276,10 +276,10 @@ function getPoint(alexaThis) {
         pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered the letter <break time="500ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(0, 1)}</say-as> `;
     }
     else {
-        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered ${points} letters <break time="500ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(0, 1)}</say-as> `;
+        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered ${points} letters <break time="250ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(0, 1)}</say-as> `;
 
         for (i = 1; i < points; i++) { 
-            pointMessage += ` <break time="250ms"/> and <break time="500ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(i, 1)}</say-as> `
+            pointMessage += ` <break time="250ms"/> <emphasis level="strong">and</emphasis> <break time="250ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(i, 1)}</say-as> `
         }
     }
 
