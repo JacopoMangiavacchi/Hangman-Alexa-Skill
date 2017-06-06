@@ -30,14 +30,18 @@
         "Is the word {word}",
         "Is the secret word {word}",
         "Is this {word}",
-        "I want to guess the word"
+        "I want to guess the word",
+        "Can I guess the word",
+        "Can I guess",
+        "Try the word {word}"
       ],
       "slots": [
         {
           "name": "word",
           "type": "LIST_OF_LETTER",
           "samples": [
-            "{word}"
+            "{word}",
+            "the word is {word}"
           ]
         }
       ]
@@ -78,7 +82,9 @@
           "name": "Letter",
           "type": "LIST_OF_LETTER",
           "samples": [
-            "{Letter} "
+            "try {Letter}",
+            "{Letter}",
+            "letter {Letter}"
           ]
         }
       ]
@@ -389,17 +395,6 @@
       ]
     },
     {
-      "id": "Confirm.Intent-Guess.IntentSlot-word",
-      "promptVersion": "1.0",
-      "definitionVersion": "1.0",
-      "variations": [
-        {
-          "type": "PlainText",
-          "value": "Are you sure the word you want to guess is {word} ?"
-        }
-      ]
-    },
-    {
       "id": "Elicit.Intent-TryLetter.IntentSlot-Letter",
       "promptVersion": "1.0",
       "definitionVersion": "1.0",
@@ -431,10 +426,9 @@
             "name": "word",
             "type": "LIST_OF_LETTER",
             "elicitationRequired": true,
-            "confirmationRequired": true,
+            "confirmationRequired": false,
             "prompts": {
-              "elicit": "Elicit.Intent-Guess.IntentSlot-word",
-              "confirm": "Confirm.Intent-Guess.IntentSlot-word"
+              "elicit": "Elicit.Intent-Guess.IntentSlot-word"
             }
           }
         ]

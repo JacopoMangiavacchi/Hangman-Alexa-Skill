@@ -58,8 +58,6 @@ var handlers = {
     'Guess': function () {
         if (this.event.request.dialogState === 'STARTED') {
             var updatedIntent = this.event.request.intent;
-            // Pre-fill slots: update the intent object with slot values for which
-            // you have defaults, then emit :delegate with this updated intent.
             //updatedIntent.slots.SlotName.value = 'DefaultValue';
             this.emit(':delegate', updatedIntent);
         } else if (this.event.request.dialogState !== undefined && this.event.request.dialogState !== 'COMPLETED'){
