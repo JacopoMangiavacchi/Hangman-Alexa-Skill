@@ -48,7 +48,7 @@ var handlers = {
     },
     'TryLetter': function () {
         var letter = isSlotValid(this.event.request, "Letter");
-        if (letter == false) {
+        if (letter === false) {
             this.emit(':ask', "Sorry, I don't understand what letter you want to try", "Please try a new letter.");
         }
         else {
@@ -65,7 +65,7 @@ var handlers = {
         } else {
             // All the slots are filled (And confirmed if you choose to confirm slot/intent)
             var word = isSlotValid(this.event.request, "word");
-            if (word == false) {
+            if (word === false) {
                 console.log("Slot not recognized 2");
                 this.emit(':ask', "Sorry, I don't understand what word you want to try", "Please try a new letter.");
             }
@@ -139,14 +139,17 @@ function handleTryLetter(letter, alexaThis) {
         }
 
         var speechOutput = "";
+        let endOfGame = false;
 
         switch (game.tryLetter(letter)) {
             case HangmanGame.tryLetterResult.won:
                 speechOutput = `You won. The secret word was ${game.secret}`;
+                endOfGame = true;
                 break;
         
             case HangmanGame.tryLetterResult.lost:
                 speechOutput = `Sorry you lost. The secret word was ${game.secret}`;
+                endOfGame = true;
                 break;
         
             case HangmanGame.tryLetterResult.alreadyTried:
@@ -166,9 +169,20 @@ function handleTryLetter(letter, alexaThis) {
                 break;
         }
 
-        alexaThis.attributes['persistedGame'] = game.saveToString();
-        alexaThis.emit(':saveState', true);
-        alexaThis.emit(':ask', speechOutput, "Please try a new letter.");
+        if (endOfGame === true) {
+            let word = game.secret;
+            getSecret( (secret) => {
+                var newGame = new HangmanGame.HangmanGame(secret);
+                alexaThis.attributes['persistedGame'] = newGame.saveToString();
+                alexaThis.emit(':saveState', true);
+                alexaThis.emit(':ask', `You won. The secret word was ${word}. <break time="1s"/> Try to catch a new word now. Please try a letter`, welcomeReprompt);
+            });
+        }
+        else {
+            alexaThis.attributes['persistedGame'] = game.saveToString();
+            alexaThis.emit(':saveState', true);
+            alexaThis.emit(':ask', speechOutput, "Please try a new letter.");
+        }
     } else {
         console.log("Error");
         alexaThis.emit(":tell", 'error');
@@ -187,11 +201,13 @@ function handleTryWord(word, alexaThis) {
             game.loadFromString(alexaThis.attributes['persistedGame']);
         }
 
-
-        if (word == game.secret) {
-            alexaThis.attributes['persistedGame'] = game.saveToString();
-            alexaThis.emit(':saveState', true);
-            alexaThis.emit(':ask', `You won. The secret word was ${game.secret}`, "Please try a new letter.");
+        if (word === game.secret) {
+            getSecret( (secret) => {
+                var newGame = new HangmanGame.HangmanGame(secret);
+                alexaThis.attributes['persistedGame'] = newGame.saveToString();
+                alexaThis.emit(':saveState', true);
+                alexaThis.emit(':ask', `You won. The secret word was ${word}. <break time="1s"/> Try to catch a new word now. Please try a letter`, welcomeReprompt);
+            });
         }
         else {
             alexaThis.emit(':ask', `Sorry.  The secret word is not ${word}`, "Please try a new letter.");
