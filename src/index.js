@@ -239,7 +239,9 @@ function isSlotValid(request, slotName){
 
 
 function getSecret(callback) {
-    var url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&minCorpusCount=0&minLength=5&maxLength=15&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
+    //var url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&minCorpusCount=0&minLength=5&maxLength=12&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
+    var url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&includePartOfSpeech=noun&excludePartOfSpeech=proper-noun&minCorpusCount=1&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=10&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
+
 
     var request = require('request');
     request(url, function (error, response, body) {
@@ -278,9 +280,19 @@ function getPoint(alexaThis) {
         pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered ${points} letters <break time="250ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(0, 1)}</say-as> `;
 
         for (i = 1; i < points; i++) { 
-            pointMessage += ` <break time="250ms"/> <emphasis level="strong">and</emphasis> <break time="250ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(i, 1)}</say-as> `
+            pointMessage += ` <break time="250ms"/> <emphasis level="reduced">and</emphasis> <break time="250ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(i, 1)}</say-as> `
+        }
+
+        pointMessage += ` <break time="1s"/> The discovered word is <break time="500ms"/>`
+        
+        let discovered = game.discovered
+
+        for (i = 0; i < discovered.length; i++) { 
+            pointMessage += `<break time="500ms"/> <say-as interpret-as=\"spell-out\">${discovered.substr(i,1)}</say-as>`
         }
     }
+
+    pointMessage += ` <break time="1s"/> The secret word is ${game.secret.length} characters length`
 
     return pointMessage
 }
