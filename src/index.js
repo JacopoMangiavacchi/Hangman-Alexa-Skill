@@ -47,24 +47,12 @@ var handlers = {
         });
     },
     'TryLetter': function () {
-        if (this.event.request.dialogState === 'STARTED') {
-            var updatedIntent = this.event.request.intent;
-            // Pre-fill slots: update the intent object with slot values for which
-            // you have defaults, then emit :delegate with this updated intent.
-            //updatedIntent.slots.SlotName.value = 'DefaultValue';
-            this.emit(':delegate', updatedIntent);
-        } else if (this.event.request.dialogState !== undefined && this.event.request.dialogState !== 'COMPLETED'){
-            this.emit(':delegate');
-        } else {
-            // All the slots are filled (And confirmed if you choose to confirm slot/intent)
-            var letter = isSlotValid(this.event.request, "Letter");
-            if (letter == false) {
-                console.log("Slot not recognized 1");
-                this.emit(':ask', "Sorry, I don't understand what letter you want to try", "Please try a new letter.");
-            }
-            else {
-                handleTryLetter(letter.substring(0, 1), this);
-            }
+        var letter = isSlotValid(this.event.request, "Letter");
+        if (letter == false) {
+            this.emit(':ask', "Sorry, I don't understand what letter you want to try", "Please try a new letter.");
+        }
+        else {
+            handleTryLetter(letter.substring(0, 1), this);
         }
     },
     'Guess': function () {
