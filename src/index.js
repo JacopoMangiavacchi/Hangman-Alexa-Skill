@@ -265,6 +265,23 @@ function getDefinition(secret, callback) {
 function getPoint(alexaThis) {
     var game = new HangmanGame.HangmanGame();
     game.loadFromString(alexaThis.attributes['persistedGame']);
-    var pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered ${game.lettersTried.length} letters`
+
+    let points = game.lettersTried.length;
+    let pointMessage = ""
+
+    if (points === 0) {
+        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered no letters`;
+    }
+    else if (points === 1) {
+        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered the letter <say-as interpret-as=\"spell-out\">${game.lettersTried.substring(0, 1)} `;
+    }
+    else {
+        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered ${points} letters. The discovered letters are `;
+
+        for (i = 0; i <= points; i++) { 
+            pointMessage += ` <say-as interpret-as=\"spell-out\">${game.lettersTried.substring(i, 1)}</say-as> <break time="0.5s"/> `
+        }
+    }
+
     return pointMessage
 }

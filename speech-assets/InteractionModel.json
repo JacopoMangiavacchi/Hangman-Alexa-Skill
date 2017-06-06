@@ -53,7 +53,12 @@
         "how many letters did I guessed",
         "recap",
         "how is the game",
-        "how am I going"
+        "how am I going",
+        "give me the point",
+        "give me the points",
+        "am I close",
+        "am I winning",
+        "please recap"
       ],
       "slots": []
     },
