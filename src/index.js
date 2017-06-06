@@ -6,7 +6,7 @@
 
 var HangmanGame = require("./HangmanGame");
 
-var welcomeOutput = "Welcome to the Hangman Game Alexa Skills Kit. You need to catch the secret word I guessed.  Try to catch this word one letter at a time";
+var welcomeOutput = "Welcome to the Hangman Game Alexa Skills. You need to catch the secret word I guessed.  Try to catch this word one letter at a time";
 var welcomeBackOutput1 = "Welcome back to the Hangman Game Alexa Skills Kit. I'm resuming this game from the previous session. ";
 var welcomeBackOutput2 = "Now try to catch the secret word one letter at a time";
 var newGameOutput = "Let's start another game now.  Try to catch the new secret word one letter at a time";
@@ -38,12 +38,12 @@ var handlers = {
         var game = new HangmanGame.HangmanGame();
         game.loadFromString(this.attributes['persistedGame']);
         var oldSecret = game.secret
-        console.log(`The secret word was ${oldSecret}`)
+        //console.log(`The secret word was ${oldSecret}`)
         getSecret( (secret) => {
             var game = new HangmanGame.HangmanGame(secret);
             this.attributes['persistedGame'] = game.saveToString();
             this.emit(':saveState', true);
-            this.emit(':ask', `The secret word was <emphasis level="strong">${oldSecret}</emphasis>` + pauseString + newGameOutput, welcomeReprompt);
+            this.emit(':ask', `The secret word was <break time="1s"/> <emphasis level="strong">${oldSecret}</emphasis>` + pauseString + newGameOutput, welcomeReprompt);
         });
     },
     'TryLetter': function () {
@@ -80,7 +80,7 @@ var handlers = {
 
         getDefinition(game.secret, (definition) => {
             //console.log(`The definition of the secret word is ${definition}.  Try to cach a new letter now`)
-            this.emit(':ask', `The definition of the secret word is <break time="1s"/> <emphasis level="strong">${definition}</emphasis>. <break time="2s"/> Try to cach a new letter now`);
+            this.emit(':ask', `The definition of the secret word is <break time="1s"/> <emphasis level="moderate">${definition}</emphasis>. <break time="2s"/> Try to cach a new letter now`);
         });
     },
     'Point': function () {
@@ -143,12 +143,12 @@ function handleTryLetter(letter, alexaThis) {
 
         switch (game.tryLetter(letter)) {
             case HangmanGame.tryLetterResult.won:
-                speechOutput = `<say-as interpret-as="interjection">bingo!</say-as> You won. The secret word was ${game.secret}`;
+                speechOutput = `<say-as interpret-as="interjection">bingo!</say-as> You won. The secret word was <break time="1s"/> ${game.secret} <break time="1s"/> Try to catch a new word now. Please try a letter`;
                 endOfGame = true;
                 break;
         
             case HangmanGame.tryLetterResult.lost:
-                speechOutput = `<say-as interpret-as="interjection">sigh!</say-as> Sorry you lost. The secret word was ${game.secret}`;
+                speechOutput = `<say-as interpret-as="interjection">sigh!</say-as> Sorry you lost. The secret word was <break time="1s"/> ${game.secret} <break time="1s"/> Try to catch a new word now. Please try a letter`;
                 endOfGame = true;
                 break;
         
@@ -170,12 +170,11 @@ function handleTryLetter(letter, alexaThis) {
         }
 
         if (endOfGame === true) {
-            let word = game.secret;
             getSecret( (secret) => {
                 var newGame = new HangmanGame.HangmanGame(secret);
                 alexaThis.attributes['persistedGame'] = newGame.saveToString();
                 alexaThis.emit(':saveState', true);
-                alexaThis.emit(':ask', `You won. The secret word was <emphasis level="strong">${word}</emphasis>. <break time="1s"/> Try to catch a new word now. Please try a letter`, welcomeReprompt);
+                alexaThis.emit(':ask', speechOutput, welcomeReprompt);
             });
         }
         else {
@@ -206,11 +205,11 @@ function handleTryWord(word, alexaThis) {
                 var newGame = new HangmanGame.HangmanGame(secret);
                 alexaThis.attributes['persistedGame'] = newGame.saveToString();
                 alexaThis.emit(':saveState', true);
-                alexaThis.emit(':ask', `<say-as interpret-as="interjection">bingo!</say-as> You won. The secret word was <emphasis level="strong">${word}</emphasis>. <break time="1s"/> Try to catch a new word now. Please try a letter`, welcomeReprompt);
+                alexaThis.emit(':ask', `<say-as interpret-as="interjection">bingo!</say-as> You won. The secret word was <break time="1s"/> <emphasis level="strong">${word}</emphasis>. <break time="1s"/> Try to catch a new word now. Please try a letter`, welcomeReprompt);
             });
         }
         else {
-            alexaThis.emit(':ask', `<say-as interpret-as="interjection">sigh!</say-as> Sorry.  The secret word is not <emphasis level="strong">${word}</emphasis>`, "Please try a new letter.");
+            alexaThis.emit(':ask', `<say-as interpret-as="interjection">sigh!</say-as> Sorry.  The secret word is not <break time="1s"/> <emphasis level="strong">${word}</emphasis>`, "Please try a new letter.");
         }
 
     } else {
