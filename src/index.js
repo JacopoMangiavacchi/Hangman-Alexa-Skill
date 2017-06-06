@@ -52,7 +52,7 @@ var handlers = {
             this.emit(':ask', "Sorry, I don't understand what letter you want to try", "Please try a new letter.");
         }
         else {
-            handleTryLetter(letter.substring(0, 1), this);
+            handleTryLetter(letter.substr(0, 1), this);
         }
     },
     'Guess': function () {
@@ -273,14 +273,13 @@ function getPoint(alexaThis) {
         pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered no letters`;
     }
     else if (points === 1) {
-        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered the letter <break time="0.5s"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substring(0, 1)}</say-as> `;
+        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered the letter <break time="500ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(0, 1)}</say-as> `;
     }
     else {
-        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered ${points} letters <break time="0.5s"/>`;
+        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered ${points} letters <break time="500ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(0, 1)}</say-as> `;
 
-        for (i = 0; i <= points; i++) { 
-            pointMessage += " and "
-            pointMessage += ` <say-as interpret-as=\"spell-out\">${game.lettersTried.substring(i, 1)}</say-as> <break time="0.5s"/> `
+        for (i = 1; i < points; i++) { 
+            pointMessage += ` <break time="250ms"/> and <break time="500ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(i, 1)}</say-as> `
         }
     }
 
