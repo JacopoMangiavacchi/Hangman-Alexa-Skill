@@ -6,12 +6,14 @@
 
 var HangmanGame = require("./HangmanGame");
 
+var maxNumberOfTry = 9;
+
 var welcomeOutput = "Welcome to the Hangman Game Alexa Skills. You need to catch the secret word I guessed.  Try to catch this word one letter at a time";
 var welcomeBackOutput1 = "Welcome back to the Hangman Game Alexa Skills Kit. I'm resuming this game from the previous session. ";
 var welcomeBackOutput2 = "Now try to catch the secret word one letter at a time";
 var newGameOutput = "Let's start another game now.  Try to catch the new secret word one letter at a time";
 var welcomeReprompt = "Try to say a letter.";
-var pauseString = ` <break time="1s"/> `;
+var pauseString = ` <break time="500ms"/> `;
 
  // Skill Code =======================================================================================================
 
@@ -23,7 +25,7 @@ var handlers = {
     'LaunchRequest': function () {
         if (this.attributes['persistedGame'] == undefined) {
             getSecret( (secret) => {
-                var game = new HangmanGame.HangmanGame(secret);
+                var game = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
                 this.attributes['persistedGame'] = game.saveToString();
                 this.emit(':saveState', true);
                 this.emit(':ask', welcomeOutput, welcomeReprompt);
@@ -40,7 +42,7 @@ var handlers = {
         var oldSecret = game.secret
         //console.log(`The secret word was ${oldSecret}`)
         getSecret( (secret) => {
-            var game = new HangmanGame.HangmanGame(secret);
+            var game = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
             this.attributes['persistedGame'] = game.saveToString();
             this.emit(':saveState', true);
             this.emit(':ask', `The secret word was <break time="1s"/> <emphasis level="strong">${oldSecret}</emphasis>` + pauseString + newGameOutput, welcomeReprompt);
@@ -159,7 +161,14 @@ function handleTryLetter(letter, alexaThis) {
                 break;
         
             case HangmanGame.tryLetterResult.notFound:
-                speechOutput = `<say-as interpret-as="interjection">moo!</say-as> Sorry, the secret word didn't contain the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>. Please try a new one`;
+                speechOutput = `<say-as interpret-as="interjection">moo!</say-as> Sorry, the secret word didn't contain the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>. `;
+                if (game.failedAttempts == maxNumberOfTry - 2) {
+                    speechOutput += ` <break time="250ms"/> Watch out, you only have two more tentatives. `;
+                }
+                else if (game.failedAttempts == maxNumberOfTry - 1) {
+                    speechOutput += ` <break time="250ms"/> Watch out, you only have one last tentative. `;
+                }
+                speechOutput += ` Please try a new letter.`;
                 break;
         
             default:
@@ -169,7 +178,7 @@ function handleTryLetter(letter, alexaThis) {
 
         if (endOfGame === true) {
             getSecret( (secret) => {
-                var newGame = new HangmanGame.HangmanGame(secret);
+                var newGame = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
                 alexaThis.attributes['persistedGame'] = newGame.saveToString();
                 alexaThis.emit(':saveState', true);
                 alexaThis.emit(':ask', speechOutput, welcomeReprompt);
@@ -200,7 +209,7 @@ function handleTryWord(word, alexaThis) {
 
         if (word === game.secret) {
             getSecret( (secret) => {
-                var newGame = new HangmanGame.HangmanGame(secret);
+                var newGame = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
                 alexaThis.attributes['persistedGame'] = newGame.saveToString();
                 alexaThis.emit(':saveState', true);
                 alexaThis.emit(':ask', `<say-as interpret-as="interjection">bingo!</say-as> You won. The secret word was <break time="1s"/> <emphasis level="strong">${word}</emphasis>. <break time="1s"/> Try to catch a new word now. Please try a letter`, welcomeReprompt);
@@ -238,8 +247,7 @@ function isSlotValid(request, slotName){
 
 function getSecret(callback) {
     //var url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&minCorpusCount=0&minLength=5&maxLength=12&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
-    var url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&includePartOfSpeech=noun&excludePartOfSpeech=proper-noun&minCorpusCount=1&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=10&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
-
+    var url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&includePartOfSpeech=noun&excludePartOfSpeech=proper-noun&minCorpusCount=1&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=8&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
 
     var request = require('request');
     request(url, function (error, response, body) {
@@ -280,8 +288,6 @@ function getDiscover(game) {
         discoverMessage = `The currently discovered word is ${game.secret.length} letters length `;
     }
 
-    discoverMessage += `<break time="1s"/> You still need to discover ${(game.secret.length - discoveredLetters.length)} letters `;
-
     return discoverMessage
 }
 
@@ -295,11 +301,13 @@ function getPoint(alexaThis) {
         pointMessage = `This is a brand new game and you didn't tried any letters yet. <break time="500ms"/> The secret word is ${game.secret.length} characters length`;
     }
     else {
-        pointMessage = getDiscover(game);
-
-        let notPresentLetters = "";
         let discovered = game.discovered;
         let discoveredLetters = discovered.replace(/_/g,"")
+
+        pointMessage = getDiscover(game);
+        pointMessage += `<break time="500ms"/> You still need to discover ${(game.secret.length - discoveredLetters.length)} letters `;
+
+        let notPresentLetters = "";
 
         for (i = 0; i < game.lettersTried.length; i++) {
             let letter = game.lettersTried.substr(i,1);
@@ -311,10 +319,10 @@ function getPoint(alexaThis) {
         // console.log(`NOT_PRESENT_LETTERS: ${notPresentLetters}`);
 
         if (notPresentLetters.length == 1) {
-            pointMessage += `<break time="1s"/> You already tried the letter <say-as interpret-as=\"spell-out\">${notPresentLetters}</say-as> `;
+            pointMessage += `<break time="500ms"/> You already tried the letter <say-as interpret-as=\"spell-out\">${notPresentLetters}</say-as> `;
         }
         else if (notPresentLetters.length > 0) {
-            pointMessage += `<break time="1s"/> You already tried these other letters `;
+            pointMessage += `<break time="500ms"/> You already tried these other letters `;
 
             for (i = 0; i < notPresentLetters.length; i++) { 
                 pointMessage += `<break time="250ms"/> <say-as interpret-as=\"spell-out\">${notPresentLetters.substr(i,1)}</say-as> `;
