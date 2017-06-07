@@ -307,9 +307,7 @@ function getPoint(alexaThis) {
         pointMessage = getDiscover(game);
         pointMessage += `<break time="500ms"/> You still need to discover ${(game.secret.length - discoveredLetters.length)} letters `;
 
-        let notPresentLetters = game.lettersTried.split("").filter(function(letter) {
-            return (discoveredLetters.indexOf(letter) == -1 );
-        }).join("");
+        let notPresentLetters = game.lettersTried.split("").filter((letter) => discoveredLetters.indexOf(letter) == -1 ).join("");
 
         // let notPresentLetters = "";
         // for (i = 0; i < game.lettersTried.length; i++) {
