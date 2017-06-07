@@ -263,32 +263,55 @@ function getPoint(alexaThis) {
     var game = new HangmanGame.HangmanGame();
     game.loadFromString(alexaThis.attributes['persistedGame']);
 
-    let points = game.lettersTried.length;
-    let pointMessage = ""
+    let pointMessage = "";
 
-    if (points === 0) {
-        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered no letters`;
-    }
-    else if (points === 1) {
-        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered the letter <break time="500ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(0, 1)}</say-as> `;
+    if (game.lettersTried.length === 0) {
+        pointMessage = `This is a brand new game and you didn't tried any letters yet. <break time="500ms"/> The secret word is ${game.secret.length} characters length`;
     }
     else {
-        pointMessage = `You unsuccesfully tried ${game.failedAttempts} time and discovered ${points} letters <break time="250ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(0, 1)}</say-as> `;
+        let discovered = game.discovered;
+        let discoveredLetters = discovered.replace(/_/g,"")
 
-        for (i = 1; i < points; i++) { 
-            pointMessage += ` <break time="250ms"/> <emphasis level="reduced">and</emphasis> <break time="250ms"/> <say-as interpret-as=\"spell-out\">${game.lettersTried.substr(i, 1)}</say-as> `
+        // console.log(`SECRET: ${game.secret}`);
+        // console.log(`DISCOVERED: ${discovered}`);
+        // console.log(`DISCOVERED_LETTERS: ${discoveredLetters}`);
+
+        if (discoveredLetters.length > 0) {
+            pointMessage = `The currently discovered word is `
+            for (i = 0; i < discovered.length; i++) { 
+                pointMessage += `<break time="500ms"/> <say-as interpret-as=\"spell-out\">${discovered.substr(i,1)}</say-as> `;
+            }
+            pointMessage += `<break time="500ms"/> And is ${game.secret.length} letters length `;
+        }
+        else {
+            pointMessage = `The currently discovered word is ${game.secret.length} letters length `;
         }
 
-        pointMessage += ` <break time="1s"/> The discovered word is <break time="500ms"/>`
-        
-        let discovered = game.discovered
+        pointMessage += `<break time="1s"/> You still need to discover ${(game.secret.length - discoveredLetters.length)} letters `;
 
-        for (i = 0; i < discovered.length; i++) { 
-            pointMessage += `<break time="500ms"/> <say-as interpret-as=\"spell-out\">${discovered.substr(i,1)}</say-as>`
+        let notPresentLetters = "";
+
+        for (i = 0; i < game.lettersTried.length; i++) {
+            let letter = game.lettersTried.substr(i,1);
+            if (discoveredLetters.indexOf(letter) == -1 ) {
+                notPresentLetters += letter;
+            }
+        }
+
+        // console.log(`NOT_PRESENT_LETTERS: ${notPresentLetters}`);
+
+        if (notPresentLetters.length == 1) {
+            pointMessage += `<break time="1s"/> You already tried the letter <say-as interpret-as=\"spell-out\">${notPresentLetters}</say-as> `;
+        }
+        else if (notPresentLetters.length > 0) {
+            pointMessage += `<break time="1s"/> You already tried these other letters `;
+
+            for (i = 0; i < notPresentLetters.length; i++) { 
+                pointMessage += `<break time="250ms"/> <say-as interpret-as=\"spell-out\">${notPresentLetters.substr(i,1)}</say-as> `;
+            }
         }
     }
 
-    pointMessage += ` <break time="1s"/> The secret word is ${game.secret.length} characters length`
-
-    return pointMessage
+    return pointMessage;
 }
+
