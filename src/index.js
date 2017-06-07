@@ -15,6 +15,15 @@ var newGameOutput = "Let's start another game now.  Try to catch the new secret 
 var welcomeReprompt = "Try to say a letter.";
 var pauseString = ` <break time="500ms"/> `;
 
+var cardTitle = 'Discover the secret word';
+var cardContent = `You can say:\n\n- "Try letter c": to check if the secret word contain the letter c\n- "Try letter bravo": to check if the secret word contain the letter b\n- "Try letter house": to check if the secret word contain the letter h\n- "Recap: to check how many letters you discovered and how many to discover\n- "What's the meaning": to get a hint and let Alexa tell you the meaning of the secret word\n- "Try word cutter": to check if the secret word is cutter\n- "I give up": to get the secret word and start a new game`;
+
+var imageObj = {
+    smallImageUrl: 'https://s3-eu-west-1.amazonaws.com/hangmanskill/skillcard/hangman+card+small.png',
+    largeImageUrl: 'https://s3-eu-west-1.amazonaws.com/hangmanskill/skillcard/hangman+card+big.png'
+};
+
+
  // Skill Code =======================================================================================================
 
 'use strict';
@@ -28,12 +37,14 @@ var handlers = {
                 var game = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
                 this.attributes['persistedGame'] = game.saveToString();
                 this.emit(':saveState', true);
-                this.emit(':ask', welcomeOutput, welcomeReprompt);
+                //this.emit(':ask', welcomeOutput, welcomeReprompt);
+                this.emit(':askWithCard', welcomeOutput, welcomeReprompt, cardTitle, cardContent, imageObj);
             });
         }
         else {
             var pointMessage = getPoint(this);
-            this.emit(':ask', welcomeBackOutput1 + pointMessage + pauseString + welcomeBackOutput2, welcomeReprompt);
+            //this.emit(':ask', welcomeBackOutput1 + pointMessage + pauseString + welcomeBackOutput2, welcomeReprompt);
+            this.emit(':askWithCard', welcomeBackOutput1 + pointMessage + pauseString + welcomeBackOutput2, welcomeReprompt, cardTitle, cardContent, imageObj);
         }
     },
     'Surrender': function () {
