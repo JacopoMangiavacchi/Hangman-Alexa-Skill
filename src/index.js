@@ -153,7 +153,9 @@ function handleTryLetter(letter, alexaThis) {
                 break;
         
             case HangmanGame.tryLetterResult.found:
-                speechOutput = `<say-as interpret-as="interjection">ha!</say-as> The secret word contain the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>.  Try to cach a new letter now`;
+                speechOutput = `<say-as interpret-as="interjection">ha!</say-as> The secret word contain the letter <say-as interpret-as=\"spell-out\">${letter}</say-as>. <break time="500ms"/>`  
+                speechOutput += getDiscover(game);
+                speechOutput += `<break time="1s"/> Try to cach a new letter now`;
                 break;
         
             case HangmanGame.tryLetterResult.notFound:
@@ -258,6 +260,30 @@ function getDefinition(secret, callback) {
     });
 }
 
+function getDiscover(game) {
+    let discoverMessage = "";
+    let discovered = game.discovered;
+    let discoveredLetters = discovered.replace(/_/g,"")
+
+    // console.log(`SECRET: ${game.secret}`);
+    // console.log(`DISCOVERED: ${discovered}`);
+    // console.log(`DISCOVERED_LETTERS: ${discoveredLetters}`);
+
+    if (discoveredLetters.length > 0) {
+        discoverMessage = `The currently discovered word is `
+        for (i = 0; i < discovered.length; i++) { 
+            discoverMessage += `<break time="500ms"/> <say-as interpret-as=\"spell-out\">${discovered.substr(i,1)}</say-as> `;
+        }
+        discoverMessage += `<break time="500ms"/> And is ${game.secret.length} letters length `;
+    }
+    else {
+        discoverMessage = `The currently discovered word is ${game.secret.length} letters length `;
+    }
+
+    discoverMessage += `<break time="1s"/> You still need to discover ${(game.secret.length - discoveredLetters.length)} letters `;
+
+    return discoverMessage
+}
 
 function getPoint(alexaThis) {
     var game = new HangmanGame.HangmanGame();
@@ -269,27 +295,11 @@ function getPoint(alexaThis) {
         pointMessage = `This is a brand new game and you didn't tried any letters yet. <break time="500ms"/> The secret word is ${game.secret.length} characters length`;
     }
     else {
-        let discovered = game.discovered;
-        let discoveredLetters = discovered.replace(/_/g,"")
-
-        // console.log(`SECRET: ${game.secret}`);
-        // console.log(`DISCOVERED: ${discovered}`);
-        // console.log(`DISCOVERED_LETTERS: ${discoveredLetters}`);
-
-        if (discoveredLetters.length > 0) {
-            pointMessage = `The currently discovered word is `
-            for (i = 0; i < discovered.length; i++) { 
-                pointMessage += `<break time="500ms"/> <say-as interpret-as=\"spell-out\">${discovered.substr(i,1)}</say-as> `;
-            }
-            pointMessage += `<break time="500ms"/> And is ${game.secret.length} letters length `;
-        }
-        else {
-            pointMessage = `The currently discovered word is ${game.secret.length} letters length `;
-        }
-
-        pointMessage += `<break time="1s"/> You still need to discover ${(game.secret.length - discoveredLetters.length)} letters `;
+        pointMessage = getDiscover(game);
 
         let notPresentLetters = "";
+        let discovered = game.discovered;
+        let discoveredLetters = discovered.replace(/_/g,"")
 
         for (i = 0; i < game.lettersTried.length; i++) {
             let letter = game.lettersTried.substr(i,1);
