@@ -88,17 +88,13 @@ var handlers = {
         this.emit(':ask', pointMessage + pauseString + welcomeBackOutput2, welcomeReprompt);
     },
     'AMAZON.HelpIntent': function () {
-        speechOutput = "";
-        reprompt = "";
-        this.emit(':ask', 'Try to catch the secret word saying for example <break time="1s"/> Try letter <say-as interpret-as=\"spell-out\">a</say-as>', "Please try a new letter now.");
+        this.emit(':ask', 'Try to catch the secret word saying for example <break time="1s"/> Try letter <say-as interpret-as=\"spell-out\">a</say-as> <break time="1s"/> or saying <break time="500ms"/> Try Letter <break time="500ms"/> and any word you want, to try the first letter of this word. <break time="1s"/> You can also try to guess the entire word, saying for example <break time="500ms"/> Is the word secret? <break time="1s"/> or just ask to recap your points', "Please try a new letter now.");
     },
     'AMAZON.CancelIntent': function () {
-        speechOutput = "";
-        this.emit(':tell', speechOutput);
+        this.emit(':tell', "OK. I've saved this session so you can restart from this next time you open the Hangman Game Skill.  Goodbye");
     },
     'AMAZON.StopIntent': function () {
-        speechOutput = "";
-        this.emit(':tell', speechOutput);
+        this.emit(':tell', "OK. I've saved this session so you can restart from this next time you open the Hangman Game Skill.  Goodbye");
     },
     'SessionEndedRequest': function () {
         var speechOutput = "";

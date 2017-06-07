@@ -33,7 +33,8 @@
         "I want to guess the word",
         "Can I guess the word",
         "Can I guess",
-        "Try the word {word}"
+        "Try the word {word}",
+        "I guess the word is {word}"
       ],
       "slots": [
         {
@@ -58,7 +59,18 @@
         "give me the points",
         "am I close",
         "am I winning",
-        "please recap"
+        "please recap",
+        "what I discovered",
+        "tell me what I discovered",
+        "tell me more",
+        "am I hanging",
+        "how close",
+        "how close am I",
+        "what I tried",
+        "what I found",
+        "what are the discovered letters",
+        "discovered letters",
+        "tell me the discovered letters"
       ],
       "slots": []
     },
@@ -69,7 +81,9 @@
         "I surrend",
         "I quit",
         "Play a new game",
-        "New game"
+        "New game",
+        "Start a new game",
+        "Restart"
       ],
       "slots": []
     },
