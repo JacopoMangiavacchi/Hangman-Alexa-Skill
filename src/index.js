@@ -8,15 +8,16 @@ var HangmanGame = require("./HangmanGame");
 
 var maxNumberOfTry = 9;
 
-var welcomeOutput = "Welcome to the Hangman Game Alexa Skills. You need to catch the secret word I guessed.  Try to catch this word one letter at a time";
-var welcomeBackOutput1 = "Welcome back to the Hangman Game Alexa Skills Kit. I'm resuming this game from the previous session. ";
+var helpOutput = `To try to catch this word one letter at a time, you can say <emphasis level="strong">Try Letter </emphasis> <break time="250ms"/> and than any letter of the alphabet <break time="500ms"/> or any word you want, <break time="250ms"/> and I will use the first letter of this word. <break time="500ms"/> You can also say <break time="250ms"/> <emphasis level="strong">Recap </emphasis> <break time="250ms"/> to check how many letters you discovered and how many to discover <break time="250ms"/> or you can say <break time="250ms"/> <emphasis level="strong">What is the meaning</emphasis> <break time="250ms"/> to get a hint and let Alexa tell you the meaning of the secret word.  `;
+var welcomeOutput = `Welcome to the Hangman Game Alexa Skill. You need to catch the secret word I guessed. <break time="500ms"/> ${helpOutput} `;
+var welcomeBackOutput1 = `Welcome back to the Hangman Game Alexa Skill. I'm resuming this game from the previous session. You need to catch the secret word I guessed. <break time="500ms"/> ${helpOutput} `;
 var welcomeBackOutput2 = "Now try to catch the secret word one letter at a time";
 var newGameOutput = "Let's start another game now.  Try to catch the new secret word one letter at a time";
 var welcomeReprompt = "Try to say a letter.";
 var pauseString = ` <break time="500ms"/> `;
 
 var cardTitle = 'Discover the secret word';
-var cardContent = `You can say:\n\n- "Try letter c": to check if the secret word contain the letter c\n- "Try letter bravo": to check if the secret word contain the letter b\n- "Try letter house": to check if the secret word contain the letter h\n- "Recap: to check how many letters you discovered and how many to discover\n- "What's the meaning": to get a hint and let Alexa tell you the meaning of the secret word\n- "Try word cutter": to check if the secret word is cutter\n- "I give up": to get the secret word and start a new game`;
+var cardContent = `You can say:\n\n- "Try letter c": to check if the secret word contain the letter c\n- "Try letter bravo": to check if the secret word contain the letter b\n- "Try letter house": to check if the secret word contain the letter h\n- "Recap: to check how many letters you discovered and how many to discover\n- "What is the meaning": to get a hint and let Alexa tell you the meaning of the secret word\n- "Try word cutter": to check if the secret word is cutter\n- "I give up": to get the secret word and start a new game`;
 
 var imageObj = {
     smallImageUrl: 'https://s3-eu-west-1.amazonaws.com/hangmanskill/skillcard/hangman+card+small.png',
@@ -38,7 +39,7 @@ var handlers = {
                 this.attributes['persistedGame'] = game.saveToString();
                 this.emit(':saveState', true);
                 //this.emit(':ask', welcomeOutput, welcomeReprompt);
-                this.emit(':askWithCard', welcomeOutput, welcomeReprompt, cardTitle, cardContent, imageObj);
+                this.emit(':askWithCard', welcomeOutput + welcomeBackOutput2, welcomeReprompt, cardTitle, cardContent, imageObj);
             });
         }
         else {
