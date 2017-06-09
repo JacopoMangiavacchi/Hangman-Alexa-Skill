@@ -35,11 +35,16 @@ var handlers = {
     'LaunchRequest': function () {
         if (this.attributes['persistedGame'] == undefined) {
             getSecret( (secret) => {
-                var game = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
-                this.attributes['persistedGame'] = game.saveToString();
-                this.emit(':saveState', true);
-                //this.emit(':ask', welcomeOutput, welcomeReprompt);
-                this.emit(':askWithCard', welcomeOutput + welcomeBackOutput2, welcomeReprompt, cardTitle, cardContent, imageObj);
+                if (secret.length > 0) {
+                    var game = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
+                    this.attributes['persistedGame'] = game.saveToString();
+                    this.emit(':saveState', true);
+                    //this.emit(':ask', welcomeOutput, welcomeReprompt);
+                    this.emit(':askWithCard', welcomeOutput + welcomeBackOutput2, welcomeReprompt, cardTitle, cardContent, imageObj);
+                }
+                else {
+                    this.emit(':tell', `I am deeply sorry, I am not able to generate a new secret word at the moment. Please retry in a bit.`);
+                }
             });
         }
         else {
@@ -54,10 +59,15 @@ var handlers = {
         var oldSecret = game.secret
         //console.log(`The secret word was ${oldSecret}`)
         getSecret( (secret) => {
-            var game = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
-            this.attributes['persistedGame'] = game.saveToString();
-            this.emit(':saveState', true);
-            this.emit(':ask', `The secret word was <break time="1s"/> <emphasis level="strong">${oldSecret}</emphasis>` + pauseString + newGameOutput, welcomeReprompt);
+            if (secret.length > 0) {
+                var game = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
+                this.attributes['persistedGame'] = game.saveToString();
+                this.emit(':saveState', true);
+                this.emit(':ask', `The secret word was <break time="1s"/> <emphasis level="strong">${oldSecret}</emphasis>` + pauseString + newGameOutput, welcomeReprompt);
+            }
+            else {
+                this.emit(':tell', `The secret word was <break time="1s"/> <emphasis level="strong">${oldSecret}</emphasis> <break time="2s"/> I am deeply sorry, I am not able to generate a new secret word at the moment. Please retry in a bit.`);
+            }
         });
     },
     'TryLetter': function () {
@@ -93,8 +103,13 @@ var handlers = {
         game.loadFromString(this.attributes['persistedGame']);
 
         getDefinition(game.secret, (definition) => {
-            //console.log(`The definition of the secret word is ${definition}.  Try to cach a new letter now`)
-            this.emit(':ask', `The definition of the secret word is <break time="1s"/> <emphasis level="moderate">${definition}</emphasis>. <break time="2s"/> Try to cach a new letter now`);
+            if (definition.length > 0) {
+                //console.log(`The definition of the secret word is ${definition}.  Try to cach a new letter now`)
+                this.emit(':ask', `The definition of the secret word is <break time="1s"/> <emphasis level="moderate">${definition}</emphasis>. <break time="2s"/> Try to cach a new letter now`, welcomeReprompt);
+            }
+            else {
+                this.emit(':ask', `Sorry, There is no definition available for this secret word.  You can continue anyway the game and try to cach a new letter now`, welcomeReprompt);
+            }
         });
     },
     'Point': function () {
@@ -190,10 +205,15 @@ function handleTryLetter(letter, alexaThis) {
 
         if (endOfGame === true) {
             getSecret( (secret) => {
-                var newGame = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
-                alexaThis.attributes['persistedGame'] = newGame.saveToString();
-                alexaThis.emit(':saveState', true);
-                alexaThis.emit(':ask', speechOutput, welcomeReprompt);
+                if (secret.length > 0) {
+                    var newGame = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
+                    alexaThis.attributes['persistedGame'] = newGame.saveToString();
+                    alexaThis.emit(':saveState', true);
+                    alexaThis.emit(':ask', speechOutput, welcomeReprompt);
+                }
+                else {
+                    this.emit(':tell', `I am deeply sorry, I am not able to generate a new secret word at the moment. Please retry in a bit.`);
+                }
             });
         }
         else {
@@ -221,10 +241,15 @@ function handleTryWord(word, alexaThis) {
 
         if (word === game.secret) {
             getSecret( (secret) => {
-                var newGame = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
-                alexaThis.attributes['persistedGame'] = newGame.saveToString();
-                alexaThis.emit(':saveState', true);
-                alexaThis.emit(':ask', `<say-as interpret-as="interjection">bingo!</say-as> You won. The secret word was <break time="1s"/> <emphasis level="strong">${word}</emphasis>. <break time="1s"/> Try to catch a new word now. Please try a letter`, welcomeReprompt);
+                if (secret.length > 0) {
+                    var newGame = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
+                    alexaThis.attributes['persistedGame'] = newGame.saveToString();
+                    alexaThis.emit(':saveState', true);
+                    alexaThis.emit(':ask', `<say-as interpret-as="interjection">bingo!</say-as> You won. The secret word was <break time="1s"/> <emphasis level="strong">${word}</emphasis>. <break time="1s"/> Try to catch a new word now. Please try a letter`, welcomeReprompt);
+                }
+                else {
+                    this.emit(':tell', `<say-as interpret-as="interjection">bingo!</say-as> You won. The secret word was <break time="1s"/> <emphasis level="strong">${word}</emphasis>. <break time="2s"/> I am deeply sorry, I am not able to generate a new secret word at the moment. Please retry in a bit.`);
+                }
             });
         }
         else {
@@ -263,9 +288,23 @@ function getSecret(callback) {
 
     var request = require('request');
     request(url, function (error, response, body) {
-        var jsonBody = JSON.parse(body);
-        var secret = jsonBody[0].word;
-        callback(secret);
+        if (error !== null) {
+            console.log(`***** ERROR ***** getSecret (${error})`);
+            callback("");
+        }
+        else {
+            var jsonBody = [];
+
+            try {
+                jsonBody = JSON.parse(body);
+                var secret = jsonBody[0].word;
+                callback(secret);
+            }
+            catch (e) {
+                console.log(`***** ERROR CATCH ***** getSecret (${e}) (${jsonBody})`);
+                callback("");
+            }
+        }
     });
 }
 
@@ -274,9 +313,29 @@ function getDefinition(secret, callback) {
 
     var request = require('request');
     request(url, function (error, response, body) {
-        var jsonBody = JSON.parse(body);
-        var definition = jsonBody[0].text;
-        callback(definition);
+        if (error !== null) {
+            console.log(`***** ERROR ***** getDefinition (${error})`);
+            callback("");
+        }
+        else {
+            if (body.length <= 2) {
+                console.log(`WARNING no definition for (${secret})`);
+                callback("");
+            }
+            else {
+                var jsonBody = [];
+
+                try {
+                    jsonBody = JSON.parse(body);
+                    var definition = jsonBody[0].text;
+                    callback(definition);
+                }
+                catch (e) {
+                    console.log(`***** ERROR CATCH ***** getDefinition (${e}) (${jsonBody})`);
+                    callback("");
+                }
+            }
+        }
     });
 }
 
